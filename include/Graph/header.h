@@ -1,5 +1,12 @@
+#define INF 1e9
+
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
+#include <queue>
+#include <vector>
+#include <algorithm>
+#include <functional>
 
 template<typename Vertex, typename Distance = double>
 class Graph {
@@ -72,6 +79,78 @@ public:
             if (edge._to == e._to && edge._distance == e._distance) return true;
         }
         return false;
+    }
+    std::vector<Edge> edges(const Vertex& vertex) {
+        return _edges[vertex];
+    }
+    size_t order() const{
+        return _vertices.size();
+    }
+    size_t degree(const Vertex& v) const {
+        size_t count = 0;
+        for (auto& edge : _edges.at(v)) {
+            if (edge._to == v) count += 2;
+            else count++;
+        }
+        return count;
+    }
+    std::vector<Edge> shortest_path(const Vertex& from, const Vertex& to) const {
+        if (!has_vertex(from) || !has_vertex(to))
+            return {};
+
+        for (const Vertex& vertex : _vertices) {
+            for (const Edge& edge : _edges.at(vertex)) {
+                if (edge._distance < 0) {
+                    throw std::runtime_error("The graph contains negative weights");
+                }
+                if (edge._to == vertex) {
+                    throw std::runtime_error("There are cycles in the graph");
+                }
+            }
+        }
+
+        std::unordered_map<Vertex, Distance> distances;
+        std::unordered_map<Vertex, Vertex> prev;
+
+        for (const auto& vertex : _vertices)
+            distances[vertex] = INF;
+        distances[from] = 0;
+
+        std::priority_queue<std::pair<Distance, Vertex>, std::vector<std::pair<Distance, Vertex>>, std::greater<std::pair<Distance, Vertex>>> pq;
+        pq.push({ 0, from });
+
+        while (!pq.empty()) {
+            Vertex u = pq.top().second;
+            pq.pop();
+
+            if (u == to) {
+                std::vector<Edge> path;
+                Vertex current = to;
+                while (current != from) {
+                    for (const auto& edge : _edges.at(prev[current])) {
+                        if (edge._to == current) {
+                            path.push_back(edge);
+                            break;
+                        }
+                    }
+                    current = prev[current];
+                }
+                std::reverse(path.begin(), path.end());
+                return path;
+            }
+
+            if (distances[u] < INF) {
+                for (const auto& edge : _edges.at(u)) {
+                    Distance alt = distances[u] + edge._distance;
+                    if (alt < distances[edge._to]) {
+                        distances[edge._to] = alt;
+                        prev[edge._to] = u;
+                        pq.push({ alt, edge._to });
+                    }
+                }
+            }
+        }
+        return {};
     }
 
 };
