@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <numeric> 
 
 template<typename Vertex, typename Distance = double>
 class Graph {
@@ -170,7 +171,7 @@ public:
             // Исследуем все смежные вершины
             for (const auto& edge : _edges.at(current)) {
                 // Если смежная вершина ещё не посещена
-                if (visited.find(edge._to) == visited.end()) {ь
+                if (visited.find(edge._to) == visited.end()) {
                     visited.insert(edge._to);
                     to_explore.push(edge._to);
                 }
@@ -178,5 +179,25 @@ public:
         }
         return traversal_order;
     }
+    Vertex find_farthest_vertex() const {
+        Vertex farthest_vertex;
+        Distance max_avg_distance = -1;
 
+        for (const auto& vertex : _vertices) {
+            if (_edges.at(vertex).empty()) continue;
+
+            Distance total_distance = std::accumulate(_edges.at(vertex).begin(), _edges.at(vertex).end(), 0.0,
+                [](Distance sum, const Edge& edge) {
+                    return sum + edge._distance;
+                });
+
+            Distance avg_distance = total_distance / _edges.at(vertex).size();
+
+            if (avg_distance > max_avg_distance) {
+                max_avg_distance = avg_distance;
+                farthest_vertex = vertex;
+            }
+        }
+        return farthest_vertex;
+    }
 };

@@ -17,7 +17,6 @@ int main()
     graph.add_edge(2, 3, 2);
     graph.add_edge(3, 4, 2);
     graph.add_edge(4, 2, 1);
-    graph.add_edge(4, 3, 3);
     graph.add_edge(3, 5, 4);
     graph.add_edge(1, 3, 4);
     graph.add_edge(5, 4, 5);
@@ -38,4 +37,8 @@ int main()
         distance += edge._distance;
     }
     std::cout << "Distance from 1 to 4 =  " << distance << std::endl;
+
+    // ¬ершина с наибольшей средней длиной ребер
+    int farthest_vertex = graph.find_farthest_vertex();
+    std::cout << "\n Max avg distance: " << farthest_vertex << std::endl;
 }
