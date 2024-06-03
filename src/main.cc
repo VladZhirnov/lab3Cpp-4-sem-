@@ -23,6 +23,14 @@ int main()
     graph.add_edge(5, 4, 5);
 
     graph.print();
+    std::vector<int> bfs_order = graph.walk(1);
+
+    //Порядок обхода в ширину
+    std::cout << "\n BFS:\n";
+    for (int vertex : bfs_order) {
+        std::cout << vertex << " ";
+    }
+    std::cout << std::endl;
 
     double distance = 0.0;
     for (const auto& edge : graph.shortest_path(1, 4)) {

@@ -152,5 +152,31 @@ public:
         }
         return {};
     }
+    std::vector<Vertex> walk(const Vertex& start_vertex) const {
+        if (!has_vertex(start_vertex)) return {};
+        std::vector<Vertex> traversal_order;
+        std::queue<Vertex> to_explore;
+        std::unordered_set<Vertex> visited;
+
+        to_explore.push(start_vertex);
+        visited.insert(start_vertex);
+
+        while (!to_explore.empty()) {
+            Vertex current = to_explore.front();
+            to_explore.pop();
+
+            traversal_order.push_back(current);
+
+            // Исследуем все смежные вершины
+            for (const auto& edge : _edges.at(current)) {
+                // Если смежная вершина ещё не посещена
+                if (visited.find(edge._to) == visited.end()) {ь
+                    visited.insert(edge._to);
+                    to_explore.push(edge._to);
+                }
+            }
+        }
+        return traversal_order;
+    }
 
 };
