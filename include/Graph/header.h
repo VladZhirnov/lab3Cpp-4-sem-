@@ -1,4 +1,5 @@
 #define INF 1e9
+#define EPSILON 1e-10
 
 #include <iostream>
 #include <unordered_map>
@@ -7,7 +8,6 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
-#include <numeric> 
 
 template<typename Vertex, typename Distance = double>
 class Graph {
@@ -64,7 +64,7 @@ public:
     bool remove_edge(const Edge& e) {
         if (!has_edge(e)) return false;
         auto& edges = _edges.at(e._from);
-        edges.erase(std::remove_if(edges.begin(), edges.end(), [e](const Edge& edge) {return edge._to == e._to && edge._distance == e._distance; }), edges.end());
+        edges.erase(std::remove_if(edges.begin(), edges.end(), [e](const Edge& edge) {return edge._to == e._to && abs(edge._distance - e._distance) < EPSILON; }), edges.end());
         return true;
     }
     bool has_edge(const Vertex& from, const Vertex& to) const {
@@ -109,7 +109,6 @@ public:
                 }
             }
         }
-
         std::unordered_map<Vertex, Distance> distances;
         std::unordered_map<Vertex, Vertex> prev;
 
@@ -161,16 +160,14 @@ public:
 
         to_explore.push(start_vertex);
         visited.insert(start_vertex);
-
+            
         while (!to_explore.empty()) {
             Vertex current = to_explore.front();
             to_explore.pop();
 
             traversal_order.push_back(current);
 
-            // Исследуем все смежные вершины
             for (const auto& edge : _edges.at(current)) {
-                // Если смежная вершина ещё не посещена
                 if (visited.find(edge._to) == visited.end()) {
                     visited.insert(edge._to);
                     to_explore.push(edge._to);
@@ -185,13 +182,13 @@ public:
 
         for (const auto& vertex : _vertices) {
             if (_edges.at(vertex).empty()) continue;
+            double summa = 0;
 
-            Distance total_distance = std::accumulate(_edges.at(vertex).begin(), _edges.at(vertex).end(), 0.0,
-                [](Distance sum, const Edge& edge) {
-                    return sum + edge._distance;
-                });
+            for (auto& edge : _edges.at(vertex)) {
+                summa += edge._distance;
+            }
 
-            Distance avg_distance = total_distance / _edges.at(vertex).size();
+            Distance avg_distance = summa / _edges.at(vertex).size();
 
             if (avg_distance > max_avg_distance) {
                 max_avg_distance = avg_distance;

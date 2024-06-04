@@ -40,5 +40,5 @@ int main()
 
     // ¬ершина с наибольшей средней длиной ребер
     int farthest_vertex = graph.find_farthest_vertex();
-    std::cout << "\n Max avg distance: " << farthest_vertex << std::endl;
+    std::cout << "\n vertex with max avg distance: " << farthest_vertex << std::endl;
 }
